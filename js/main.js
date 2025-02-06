@@ -4,7 +4,8 @@ let app = new Vue({
     data: {
         product: "Socks",
         image: "./assets/vmSocks-green-onWhite.jpg",
-        description: "A pair of warm, fuzzy socks."
+        description: "A pair of warm, fuzzy socks.",
+        altText: "A pair of socks",
     }
 })
 
