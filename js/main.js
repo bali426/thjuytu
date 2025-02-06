@@ -1,3 +1,4 @@
+// let product = "Socks";
 let app = new Vue({
     el: '#app',
     data: {
@@ -6,3 +7,5 @@ let app = new Vue({
         description: "A pair of warm, fuzzy socks."
     }
 })
+
+
