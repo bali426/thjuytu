@@ -22,6 +22,9 @@
             <h1>{{ product }}</h1>
             <p>{{description}}</p>
             <a v-bind:href="link">More products like this.</a>
+            <p v-show="inStock">In Stock</p>
+            <p v-else>Out of stock</p>
+            <span>{{onSale}}</span>
         </div>
 </div>
 
