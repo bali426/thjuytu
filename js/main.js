@@ -1,72 +1,74 @@
-// let product = "Socks";
-Vue.component('product', {
+Vue.component('product-detail', {
     props: {
-        premium: {
-
-            type: Boolean,
+        details: {
+            type: Array,
             required: true
         }
     },
     template: `
-    <div class="product">
+    <ul>
+        <li v-for="detail in details">{{ detail }}</li>
+    </ul>
+    `,
 
-        <div class="product-image">
-            <img v-bind:src="image" v-bind:alt="altText" />
-        </div>
+})
 
-        <div class="product-info">
-            <h1>{{ title }}</h1>
-            <p>{{description}}</p>
-            <a v-bind:href="link">More products like this.</a>
-            <p v-if="inStock">In Stock</p>
-            <p v-else class="strikethrough">Out of Stock</p>
-            <p>{{ sale }}</p>
-            
-            <product-details :details="details"></product-details>
-            
-            <ul>
-                <li v-for="size in sizes" :key="size">{{ size }}</li>
-            </ul>
 
-            <div
-                    class="color-box"
-                    v-for="variant in variants"
-                    :key="variant.variantId"
-                    :style="{ backgroundColor:variant.variantColor }"
-                    @mouseover="updateProduct(variant.variantImage)"
-            >
+Vue.component('product', {
+    props: {
+        premium: {
+            type: Boolean,
+            required: true
+        }
+    },
+
+    template: `
+   <div class="product">
+            <div class="product-image">
+              <img alt="#" :src="image" :alt="altText"/>
             </div>
-           <div class="cart">
-                <p>Cart({{ cart }})</p>
+            <div class="product-info">
+                <h1>{{ title }}</h1>
+                <p>{{description}}</p>
+                <product-detail :details="details"> </product-detail>
+
+                <a href="https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks">{{link}}</a>
+                <p v-if="inStock">In Stock</p>
+                <p v-else :class="{ line: !inStock }" >Out of Stock</p>
+                <span v-if="onSale">On Sale</span>
+                <div
+                     class="color-box"
+                     v-for="(variant, index) in variants"
+                     :key="variant.variantId"
+                     :style="{ backgroundColor:variant.variantColor }"
+                     @mouseover="updateProduct(index)">
+
+
+
+                </div>
+                <li v-for="size in sizes">{{size}}</li>
+                <div class="cart">
+                    
+                    <button v-on:click="addToCart"  :class="{ disabledButton: !inStock }">Add to cart</button>
+                    <button v-on:click="deleteOnCart">Delete from cart</button>
+                </div>
+                <span>{{ sale }}</span>
+                <p>Shipping: {{ shipping }}</p>
+                       
             </div>
-
-            <button
-                    v-on:click="addToCart"
-                    :disabled="!inStock"
-                    :class="{ disabledButton: !inStock }"
-            >
-                Add to cart
-            </button>
-
-         <button v-on:click="deleteToCart">delete to cart</button>
-            </div>
-
-        </div>
- `,
-    data () {
+        </div>`
+    ,
+    data() {
         return {
             product: "Socks",
             brand: 'Vue Mastery',
-            image: "./assets/vmSocks-green-onWhite.jpg",
-            description: "A pair of warm, fuzzy socks.",
-            altText: "A pair of socks",
-            selectedVariant: 0,
-            link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks.",
-            inventory: 100,
-            onSale: true,
-            inStock: true,
-            premium: true,
+            description: "A pair of warm, fuzzy socks",
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
+            selectedVariant: 0,
+            altText: "A pair of socks",
+            link: "More products like this",
+            onSale: true,
+
             variants: [
                 {
                     variantId: 2234,
@@ -81,66 +83,70 @@ Vue.component('product', {
                     variantQuantity: 0
                 }
             ],
-
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            cart: 0
+
         }
     },
-        methods: {
-            addToCart() {
-                this.cart += 1
-            },
-            deleteToCart() {
-                this.cart -= 1
-            },
-            updateProduct(variantImage) {
-                this.image = variantImage
-            },
+
+    methods: {
+        addToCart() {
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+
         },
 
+
+        updateProduct(index) {
+            this.selectedVariant = index;
+
+        },
+
+        deleteOnCart() {
+            this.$emit('del-to-cart', this.variants[this.selectedVariant].variantId);
+        },
+    },
     computed: {
         title() {
             return this.brand + ' ' + this.product;
         },
         sale() {
-            return this.onSale
-                ? `Сейчас распродажа на ${this.brand} ${this.product}!`
-                : `Распродажа не проводится на ${this.brand} ${this.product}.`;
+            return this.onSale ? `${this.brand} ${this.product} is on sale!` : `${this.brand} ${this.product} is not on sale.`;
         },
-        inStock(){
+        image() {
+            return this.variants[this.selectedVariant].variantImage;
+        },
+        inStock() {
             return this.variants[this.selectedVariant].variantQuantity
-        }
-    },
+        },
+        shipping() {
+            if (this.premium) {
+                return "Free";
+            } else {
+                return 2.99
+            }
+        },
 
+
+    },
 })
-
-
-Vue.component('product-details', {
-    props: {
-        details: {
-            type: Array,
-            required: true
-        }
-    },
-    template: `
-        <ul>
-            <li v-for="detail in details" :key="detail">{{ detail }}</li>
-        </ul>
-    `
-});
-
-
 
 
 let app = new Vue({
+
     el: '#app',
     data: {
-        premium: true
+        premium: true,
+        cart: []
+
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        },
+        delCart(id) {
+            this.cart.pop(id);
+        }
+
     }
+
+
 })
-
-
-
-
-
-
