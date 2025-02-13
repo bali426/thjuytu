@@ -56,14 +56,12 @@ Vue.component('product', {
         return {
             product: "Socks",
             brand: 'Vue Mastery',
-            image: "./assets/vmSocks-green-onWhite.jpg",
             description: "A pair of warm, fuzzy socks.",
             altText: "A pair of socks",
             selectedVariant: 0,
             link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks.",
             inventory: 100,
             onSale: true,
-            inStock: true,
             premium: true,
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [
@@ -94,7 +92,7 @@ Vue.component('product', {
         },
         updateProduct(index) {
             this.selectedVariant = index;
-            console.log(this.selectedVariant);
+            console.log(this.variants);
         },
         deleteFromCart(index) {
             console.log("sdf", index);
@@ -114,7 +112,7 @@ Vue.component('product', {
                 : `Распродажа не проводится на ${this.brand} ${this.product}.`;
         },
         inStock() {
-            return this.variants[this.selectedVariant].variantQuantity
+            return this.variants[this.selectedVariant].variantQuantity;
         },
         image() {
             return this.variants[this.selectedVariant].variantImage;
